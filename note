@@ -1,7 +1,21 @@
-3 6
+    for(int i=1;i<n;i++) for(int j=i+1;j<=n;++j){
+        cout << "LCA(" << i << ", " << j << ") : ";
+        int le = numToIdx[i];
+        int ri = numToIdx[j];
+        if(le > ri) swap(le,ri);
+        // le <= ri
+        printf("segquery(1,1,%d,%d,%d) ",dfsVec.size(),le,ri);
+        cout << idxToNum[segquery(1,0,dfsVec.size()-1,le,ri)] << endl;
+    }
 
-1
-antarctica -> r
-antahellotica -> h,e,l,o
-antacartica -> r
+    for(int i=1;i<n;i++) for(int j=i+1;j<=n;++j){
+        cout << "LCA(" << i << ", " << j << ") : ";
+        int le = numToIdx[i];
+        int ri = numToIdx[j];
+        if(le > ri) swap(le,ri);
+        // le <= ri
+        printf("segquery(1,0,%d,%d,%d) idx: %d   ",dfsVec.size()-1,le,ri, segquery(1,0,dfsVec.size()-1,le,ri));
+        cout << idxToNum[segquery(1,0,dfsVec.size()-1,le,ri)] << endl;
+    }
 
+    printf("seginit(%d, %d, %d) : %d\n",num, left, right, t2);
