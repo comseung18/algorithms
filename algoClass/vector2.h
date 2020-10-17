@@ -4,11 +4,13 @@ using namespace std;
 
 class vector2{
     public:
-    static const double PI = 2.0*acos(0.0);
+    static const double PI;
     double x,y;
 
     explicit vector2(double _x=0, double _y=0):
-    x(_x),y(_y) {}
+    x(_x),y(_y) {
+        
+    }
 
     bool operator==(const vector2& rhs) const{
         return x== rhs.x && y == rhs.y;
@@ -23,6 +25,9 @@ class vector2{
     }
     vector2 operator-(const vector2& rhs) const{
         return vector2(x-rhs.x, y-rhs.y);
+    }
+    vector2 operator-()const{
+        return vector2(-x,-y);
     }
 
     vector2 operator*(double rhs) const{
@@ -45,7 +50,7 @@ class vector2{
     }
 
     double cross(const vector2& rhs) const{
-        return x*rhs.y - rhs.x - y;
+        return x*rhs.y - rhs.x*y;
     }
 
     vector2 project(const vector2& rhs) const{
@@ -53,3 +58,5 @@ class vector2{
         return r*r.dot(*this);
     }
 };
+
+const double vector2::PI = 2.0*acos(0.0);
