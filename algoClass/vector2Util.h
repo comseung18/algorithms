@@ -1,72 +1,72 @@
 #include <./vector2.h>
 
 const double EPSILON = 1e-9;
-// 원점에서 벡터 b가 벡터 a의 반시계 방향이면 양수,
-// 시계방향이면 음수, 평행이면 0을 반환
+// ?��?��?��?�� 벡터 b�? 벡터 a?�� 반시�? 방향?���? ?��?��,
+// ?��계방?��?���? ?��?��, ?��?��?���? 0?�� 반환
 double ccw(vector2 a, vector2 b){
     return a.cross(b);
 }
 
-// 점 p 를 기준으로 벡터 b가 벡터 a의 반시계 방향이면 음수,
-// 시계 방향이면 음수, 평행이면 0 을 반환
+// ?�� p �? 기�???���? 벡터 b�? 벡터 a?�� 반시�? 방향?���? ?��?��,
+// ?���? 방향?���? ?��?��, ?��?��?���? 0 ?�� 반환
 
 double ccw(vector2 p, vector2 a, vector2 b){
     return ccw(a-p,b-p);
 }
 
-// (a,b) 를 포함하는 선과 (c,d) 를 포함하는 선의 교점을 x 에 반환한다.
-// 두 선이 평행이면 (곂치는 경우를 포함) 거짓을, 아니면 참을 반환한다.
+// (a,b) �? ?��?��?��?�� ?���? (c,d) �? ?��?��?��?�� ?��?�� 교점?�� x ?�� 반환?��?��.
+// ?�� ?��?�� ?��?��?���? (곂치?�� 경우�? ?��?��) 거짓?��, ?��?���? 참을 반환?��?��.
 bool lineIntersection(vector2 a, vector2 b,
 vector2 c, vector2 d, vector2& x){
     double det = (b-a).cross(d-c);
 
-    // 두 선이 평행인 경우
+    // ?�� ?��?�� ?��?��?�� 경우
     if(fabs(det)  < EPSILON) return false;
     x = a + (b-a)*((c-a).cross(d-c)/det);
     return true;
 }
 
-// (a,b)와 (c,d)가 평행한 두 선분일 때 
-// 이들이 한 점에서 곂치는 지 확인하다
+// (a,b)??? (c,d)�? ?��?��?�� ?�� ?��분일 ?�� 
+// ?��?��?�� ?�� ?��?��?�� 곂치?�� �? ?��?��?��?��
 bool parallelSegments(vector2 a, vector2 b,
 vector2 c, vector2 d, vector2 &p){
     if(b < a) swap(a,b);
     if(d<c) swap(c,d);
-    // 한 직선 위에 없거나 두 선분이 겹치지 않는 경우를 우선 걸러낸다.
+    // ?�� 직선 ?��?�� ?��거나 ?�� ?��분이 겹치�? ?��?�� 경우�? ?��?�� 걸러?��?��.
     if(ccw(a,b,c) != 0 || b <c || d < a) return false;
     
     if(a<c) p =c; else p=a;
     return true;
 }
 
-// p 가 (a,b) 를 감싸면서 각 변이 x,y 축에 평행한 최소 사각형 내부에 있는지 확인한다.
-// a,b,p 는 일직선 안에 있다고 가정한다.
+// p �? (a,b) �? 감싸면서 �? �??�� x,y 축에 ?��?��?�� 최소 ?��각형 ?���??�� ?��?���? ?��?��?��?��.
+// a,b,p ?�� ?��직선 ?��?�� ?��?���? �??��?��?��.
 bool inBoundingRectangle(vector2 p, vector2 a, vector2 b){
     if(b<a) swap(a,b);
     return p==a || p==b || (a<p) && (p<b);
 }
 
-// (a,b) 선분과 (c,d) 선분의 교점을 p 에 반환한다.
-// 교점이 여러 개일 경우 아무 점이나 반환한다.
-// 두 선분이 교차하지 않을 경우 false 를 반환한다.
+// (a,b) ?��분과 (c,d) ?��분의 교점?�� p ?�� 반환?��?��.
+// 교점?�� ?��?�� 개일 경우 ?���? ?��?��?�� 반환?��?��.
+// ?�� ?��분이 교차?���? ?��?�� 경우 false �? 반환?��?��.
 bool segmentIntersection(vector2 a, vector2 b,
 vector2 c, vector2 d, vector2&p){
 
-    // 두 직선이 평행인 경우를 우선 예외로 처리한다.
+    // ?�� 직선?�� ?��?��?�� 경우�? ?��?�� ?��?���? 처리?��?��.
     if(!lineIntersection(a,b,c,d,p))
         return parallelSegments(a,b,c,d,p);
     
-    // p 가 두 선분에 포함되어 있는 경우에만 참을 반환한다.
+    // p �? ?�� ?��분에 ?��?��?��?�� ?��?�� 경우?���? 참을 반환?��?��.
     return inBoundingRectangle(p,a,b) &&
     inBoundingRectangle(p,c,d);
 }
 
-// 두 선분이 서로 접촉하는지 여부를 반환한다.
+// ?�� ?��분이 ?���? ?��촉하?���? ?���?�? 반환?��?��.
 bool segmentIntersects(vector2 a, vector2 b, vector2 c, vector2 d){
     double ab = ccw(a,b,c)*ccw(a,b,d);
     double cd = ccw(c,d,a)*ccw(c,d,b);
 
-    // 두 선분이 한 직선 위에 있거나 끝점이 곂치는 경우
+    // ?�� ?��분이 ?�� 직선 ?��?�� ?��거나 ?��?��?�� 곂치?�� 경우
     if(ab== 0 && cd == 0){
         if(b<a) swap(a,b);
         if(d<c) swap(c,d);
@@ -75,14 +75,14 @@ bool segmentIntersects(vector2 a, vector2 b, vector2 c, vector2 d){
     return ab <= 0 && cd <= 0;
 }
 
-// 점 q가 다각형 p 안에 포함되어 있을 경우 참, 아닌 경우
-// 거짓을 반환한다. q가 다각형의 경계 위에 있는 경우의
-// 반환 값은 정의되어 있지 않다.
+// ?�� q�? ?��각형 p ?��?�� ?��?��?��?�� ?��?�� 경우 �?, ?��?�� 경우
+// 거짓?�� 반환?��?��. q�? ?��각형?�� 경계 ?��?�� ?��?�� 경우?��
+// 반환 값�?? ?��?��?��?�� ?���? ?��?��.
 bool isInside(vector2 q, const vector<vector2>&p){
     int crosses = 0;
     for(int i=0;i<p.size();++i){
         int j =(i+1)%p.size();
-        // (p[i],p[j])가 반직선을 세로로 가로지르는가?
+        // (p[i],p[j])�? 반직?��?�� ?��로로 �?로�??르는�??
         if((p[i].y > q.y) != (p[j].y > q.y)){
             double atX = (p[j].x - p[i].x)*(q.y - p[i].y)/
             (p[j].y - p[i].y) + p[i].x;
@@ -94,8 +94,8 @@ bool isInside(vector2 q, const vector<vector2>&p){
 
 typedef vector<vector2> polygon;
 
-// 주어진 단순 다각형 p의 넓이를 구한다.
-// p는 각 꼭지점의 위치 벡터의 집합으로 주어진다.
+// 주어�? ?��?�� ?��각형 p?�� ?��?���? 구한?��.
+// p?�� �? �?�??��?�� ?���? 벡터?�� 집합?���? 주어진다.
 double area(const polygon& p){
     double ret = 0;
     for(int i=0;i<p.size();++i){
@@ -104,7 +104,7 @@ double area(const polygon& p){
     }
     return fabs(ret)/2.0;
 }
-// points 에 있는 점들을 모두 포함하는 최소의 볼록 다각형을 찾는다.
+// points ?�� ?��?�� ?��?��?�� 모두 ?��?��?��?�� 최소?�� 볼록 ?��각형?�� 찾는?��.
 polygon giftWrap(const vector<vector2> & points){
     int n = points.size();
     polygon hull;
@@ -112,8 +112,8 @@ polygon giftWrap(const vector<vector2> & points){
     vector2 pivot = *min_element(points.begin(),points.end());
     hull.push_back(pivot);
     while(1){
-        //ph 에서 시작하는 벡터가 가장 왼쪽인 점 next 를 찾는다.
-        //평행인 점이 여러 개 있으면 가장 먼 것을 선택한다.
+        //ph ?��?�� ?��?��?��?�� 벡터�? �??�� ?��쪽인 ?�� next �? 찾는?��.
+        //?��?��?�� ?��?�� ?��?�� �? ?��?���? �??�� �? 것을 ?��?��?��?��.
         vector2 ph = hull.back(), next = points[0];
         for(int i=1;i<n;++i){
             double cross = ccw(ph, next, points[i]);
@@ -128,16 +128,16 @@ polygon giftWrap(const vector<vector2> & points){
     return hull;
 }
 
-// 두 다각형이 서로 닿거나 곂치는지 여부를 반환한다.
-// 한 점이라도 곂친다면 true를 반환한다.
+// ?�� ?��각형?�� ?���? ?��거나 곂치?���? ?���?�? 반환?��?��.
+// ?�� ?��?��?��?�� 곂친?���? true�? 반환?��?��.
 bool polygonIntersects(const polygon& p, const polygon& q){
     int n = p.size(), m= q.size();
-    // 우선 한 다각형이 다른 다각형에 포함되어 있는 경우를
-    // 확인하자.
+    // ?��?�� ?�� ?��각형?�� ?���? ?��각형?�� ?��?��?��?�� ?��?�� 경우�?
+    // ?��?��?��?��.
     if(isInside(p[0],q) || isInside(q[0],p)) return true;
 
-    // 이 외의 경우, 두 다각형이 서로 곂친다면 서로 닿는 두변이
-    // 반드시 존재한다.
+    // ?�� ?��?�� 경우, ?�� ?��각형?�� ?���? 곂친?���? ?���? ?��?�� ?���??��
+    // 반드?�� 존재?��?��.
     for(int i=0;i<n;++i)
         for(int j=0;j<m;++j)
             if(segmentIntersects(p[i],p[(i+1)%n],
@@ -145,19 +145,19 @@ bool polygonIntersects(const polygon& p, const polygon& q){
     return false;
 }
 
-// 반시계 방향으로 주어진
-// 두 "볼록" 다각형의 겹쳐진 부분의 넓이를 구한다.
-// 이 때 각 볼록 다각형의 꼭짓점은 다른 볼록 다각형의
-// 변 위에 없다고 가정한다.
+// 반시�? 방향?���? 주어�?
+// ?�� "볼록" ?��각형?�� 겹쳐�? �?분의 ?��?���? 구한?��.
+// ?�� ?�� �? 볼록 ?��각형?�� �?짓점??? ?���? 볼록 ?��각형?��
+// �? ?��?�� ?��?���? �??��?��?��.
 double polygonIntersection(const polygon& p, const polygon& q){
-    // 서로 닿지 않는 경우를 예외처리
+    // ?���? ?���? ?��?�� 경우�? ?��?��처리
     if(!polygonIntersects(p,q)) return 0;
 
-    // 겹쳐진 볼록 다각형은 
-    // p 안에 있는 q 의 꼭짓점
-    // q 안에 있는 p 의 꼭짓점
-    // p와 q 의 선분의 교점들
-    // 을 이용하여 만들어진다.
+    // 겹쳐�? 볼록 ?��각형??? 
+    // p ?��?�� ?��?�� q ?�� �?짓점
+    // q ?��?�� ?��?�� p ?�� �?짓점
+    // p??? q ?�� ?��분의 교점?��
+    // ?�� ?��?��?��?�� 만들?��진다.
     vector<vector2> v;
     int n = p.size();
     int m = q.size();
@@ -174,25 +174,25 @@ double polygonIntersection(const polygon& p, const polygon& q){
             }
         }
 
-    // v의 점들을 이용해 컨백스홀을 구성한다.
+    // v?�� ?��?��?�� ?��?��?�� 컨백?��????�� 구성?��?��.
     polygon c = giftWrap(v);
-    // c 의 넓이를 구한다.
+    // c ?�� ?��?���? 구한?��.
     return area(c);
             
 }
 
-// 그라함스캔을 이용해 convexHull 을 찾음
-// points 의 vector 가 sorting 되므로 변경됨을 주의!
+// 그라?��?��캔을 ?��?��?�� convexHull ?�� 찾음
+// points ?�� vector �? sorting ?���?�? �?경됨?�� 주의!
 polygon grahamScan(vector<vector2>& points){
-    // y 좌표가 가장 낮은 점을 선택
-    // 그러한 점이 여러개 라면 x 가 가장 낮은 점 선택
+    // y 좌표�? �??�� ?��??? ?��?�� ?��?��
+    // 그러?�� ?��?�� ?��?���? ?���? x �? �??�� ?��??? ?�� ?��?��
     sort(points.begin(),points.end(),
     [](const vector2& v1, const vector2& v2){
         return v1.y != v2.y ? v1.y < v2.y : v1.x < v2.x;
     });
 
     vector2 pivot = points[0];
-    // x 축 pivot 과 이루는 각이 작은 순서로 정렬
+    // x �? pivot �? ?��루는 각이 ?��??? ?��?���? ?��?��
     sort(points.begin()+1, points.end(),
     [pivot](const vector2& v1, const vector2& v2){
         
@@ -229,28 +229,28 @@ polygon grahamScan(vector<vector2>& points){
     return p;
 }
 
-// 시계 반대 방향으로 주어진 블록 다각형에서 가장 먼 꼭짓점 쌍 사이의 거리를 반환한다.
+// ?���? 반�?? 방향?���? 주어�? 블록 ?��각형?��?�� �??�� �? �?짓점 ?�� ?��?��?�� 거리�? 반환?��?��.
 double diameter(const polygon& p){
     int n = p.size();
-    // 우선 가장 왼쪽에 있는 점과 오른쪽에 있는 점을 찾는다.
+    // ?��?�� �??�� ?��쪽에 ?��?�� ?���? ?��른쪽?�� ?��?�� ?��?�� 찾는?��.
     int left = min_element(p.begin(),p.end()) - p.begin();
     int right = max_element(p.begin(), p.end()) - p.begin();
 
-    //p[left] 와 p[right] 에 각각 수직선을 붙인다. 두 수직선은 서로 정반대 방향을 가리키므로,
-    // A의 방향만을 표현하면된다. 
+    //p[left] ??? p[right] ?�� 각각 ?��직선?�� 붙인?��. ?�� ?��직선??? ?���? ?��반�?? 방향?�� �?리키�?�?,
+    // A?�� 방향만을 ?��?��?��면된?��. 
     vector2 calipersA(0,1);
     double ret = (p[right]-p[left]).norm();
 
-    // toNext[i] = p[i]에서 다음 점까지의 방향을 나타내는 단위 벡터
+    // toNext[i] = p[i]?��?�� ?��?�� ?��까�???�� 방향?�� ?��????��?�� ?��?�� 벡터
     vector<vector2> toNext(n);
     for(int i=0;i<n;++i)
         toNext[i] = (p[(i+1)%n] - p[i]).normalize();
     
     int a = left, b = right;
 
-    // 반 바퀴 돌아서 두 선분이 서로 위치를 바꿀 때까지 계속한다.
+    // �? 바�?? ?��?��?�� ?�� ?��분이 ?���? ?��치�?? 바�?? ?��까�?? 계속?��?��.
     while(a!= right || b != left){
-        // a에서 다음 점까지의 각도와 b에서 다음 점까지의 각도 중 어느 쪽이 작은지 확인
+        // a?��?�� ?��?�� ?��까�???�� 각도??? b?��?�� ?��?�� ?��까�???�� 각도 �? ?��?�� 쪽이 ?��???�? ?��?��
         double cosA = calipersA.dot(toNext[a]);
         double cosB = -calipersA.dot(toNext[b]);
         if(cosA > cosB){
