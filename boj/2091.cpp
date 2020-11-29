@@ -25,9 +25,14 @@ int main(){
     
     rep(i,4){
         if(have[i] == 0) continue;
-        rep(m,10000){
+        rep(m,10001){
             if(m-coin[i] >= 0){
-                cnt[m] = max(cnt[m],cnt[m-coin[i]] +1);
+                if(cnt[m-coin[i]])
+                    cnt[m] = max(cnt[m],cnt[m-coin[i]] +1);
+                else{
+                    if(m%coin[i] == 0)
+                        cnt[m] = max(cnt[m],m/coin[i]);
+                }
                 if(last < m && ((m-last)/coin[i] >= have[i])){
                     last = m;
                     break;
@@ -44,13 +49,15 @@ int main(){
         cout << x << " 0 0 0";
         return 0;
     }
-    rep(B,have[1])
-        rep(C,have[2]){
+    rep(B,have[1]+1)
+        rep(C,have[2]+1){
             // 24*D = x-cnt[x] - 4*B - 9*C
             if((x-cnt[x] - 4*B - 9*C)%24) continue;
             int D = (x-cnt[x] - 4*B - 9*C)/24;
             if(D < 0 || D > have[3]) continue;
-            cout << cnt-B-C-D << ' ' << B << ' ' << C << ' ' << D;
+            int A = cnt[x]-B-C-D;
+            if(A<0 || A>have[0]) continue;
+            cout << A << ' ' << B << ' ' << C << ' ' << D;
             return 0;
         }
     cout << "좆망";
