@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
+typedef pair<int,int> pi;
 typedef vector<int> vi;
 typedef vector<bool> vb;
 typedef vector<vector<int>> vvi;
@@ -9,25 +10,18 @@ typedef vector<vector<int>> vvi;
 #define rep(i,n) for(int i=0;i<(n);++i)
 #define fastio ios_base::sync_with_stdio(0);cin.tie(0); cout.tie(0);
 
-int n;
-string L,l;
-int len[501];// len[i] 는 i번쨰 문자의 길이
-bool v[501][100001]; // v[i][j] 는 i번째 문자를 L[i] 에서 붙일 수 있는가
-int cache[100001]; // dp[pos] 는 pos 부터 붙여 넣을 수 있는 짧은 문자열의 총합의 최대 값
-int pi[10001];
-
 // N에서 자기 자신을 찾으면서 나타나는 부분 일치를 이용해
 // pi[]를 계산한다.
 // pi[i]=N[..i]의 접미사도 되고 접두사도 되는 문자열의 최대 길이
-void getPartialMatch(){
-    int m = l.size();
-    memset(pi,0,sizeof(pi));
+vector<int> getPartialMatch(const string& N){
+    int m = N.size();
+    vector<int> pi(m,0);
     // KMP 로 자기자신을 찾는다.
     // N을 N에서 찾는다. begin = 0 이면 자기자신을 찾아버리니까 안됨!
     int begin =1, matched = 0;
     // 비교할 문자가 N의 끝에 도달할 떄까지 찾으면서 부분 일치를 모두 기록한다.
     while(begin+matched < m){
-        if(l[begin+matched] == l[matched]){
+        if(N[begin+matched] == N[matched]){
             ++matched;
             pi[begin+matched-1] = matched;
         }
@@ -40,22 +34,22 @@ void getPartialMatch(){
             }
         }
     }
-    return;
+    return pi;
 }
-int nn;
 // 짚더미 H의 부분 문자열로 바늘 N이 출현하는 시작 위치들을 모두 반환한다.
-void kmpSearch(int id){
-    int m = l.size();
+vector<int> kmpSearch(const string& H, const string& N){
+    int n = H.size(), m = N.size();
+    vector<int> ret;
     //pi[i] 는 N[..i]의 접미사도 되고 접두사도 되는 문자열의 최대 길이
-    getPartialMatch();
+    vector<int> pi = getPartialMatch(N);
     // begin = matched = 0 에서 부터 시작하자.
     int begin =0, matched = 0;
-    while(begin <= nn-m){
+    while(begin <= n-m){
         // 만약 짚더미의 해당 글자가 바늘의 해당 글자와 같다면
-        if(matched < m && L[begin+matched] == l[matched]){
+        if(matched < m && H[begin+matched] == N[matched]){
             ++matched;
             // 결과적으로 m글자가 모두 일치했다면 답에 추가한다.
-            if(matched == m) v[id][begin] = true;
+            if(matched == m) ret.push_back(begin);
         }
         else{
             // 예외: matched가 0인 경우에는 다음 칸에서 부터 계속
@@ -69,34 +63,36 @@ void kmpSearch(int id){
             }
         }
     }
-    return;
-}
-
-int dp(int pos){
-    if(pos >= L.size()) return 0;
-    int & ret = cache[pos];
-    if(ret != -1) return ret;
-
-    ret = 0;
-    rep(i,n){
-        if(!v[i][pos]) continue;
-        int tmp = pos + len[i];
-        ret = max(ret, dp(tmp) + len[i]);
-    }
-    ret = max(ret,dp(pos+1));
     return ret;
 }
+
 int main(){
     fastio;
-    cin >> L;
-    cin >> n;
-    nn = L.size();
-    rep(i,n){
-        cin >> l;
-        len[i] = l.size();
-        kmpSearch(i);
+    int T;
+    cin >> T;
+    while(T--){
+        string A,W,S;
+        cin >> A >> W >> S;
+        vi ans;
+        map<char,int> idx;
+        rep(i,A.size()){
+            idx[A[i]] = i;
+        }
+        rep(i,A.size()){
+            if(i) rep(j,W.size()){
+                int t = idx[W[j]];
+                W[j] = A[(t+1)%A.size()];
+            }
+            vi t = kmpSearch(S,W);
+            if(t.size()==1) ans.push_back(i);
+        }
+        if(ans.empty()) cout << "no solution\n";
+        else if(ans.size() ==1 ) cout << "unique: " << ans[0] << endl;
+        else{
+            cout << "ambiguous:";
+            rep(i,ans.size()) cout << ' ' << ans[i];
+            cout << endl;
+        }
     }
-    memset(cache,-1,sizeof(cache));
-    cout << dp(0);
     return 0;
 }
